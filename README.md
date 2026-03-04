@@ -46,7 +46,7 @@ Registo e controlo de Alunos/Utilizadores.
 
 ---
 
-##️ Arquitetura e Padrões
+## Arquitetura e Padrões
 
 - Padrão **DTO (Data Transfer Object)** para isolar as entidades da base de dados
 - **Global Exception Handler (@RestControllerAdvice)** para tratamento centralizado de erros
@@ -72,7 +72,7 @@ Registo e controlo de Alunos/Utilizadores.
 
 ---
 
-###️ Passo 1: Configurar a Base de Dados
+### Passo 1: Configurar a Base de Dados
 
 Crie uma base de dados vazia no seu MySQL chamada **biblioteca**:
 
