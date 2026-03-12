@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor // Injeta as dependências automaticamente (substitui o @Autowired)
+@RequiredArgsConstructor
 public class CategoriaService {
 
     private final CategoriaRepository repository;
@@ -43,15 +43,12 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponseDTO atualizar(Integer id, CategoriaRequestDTO requestDTO) {
-        // 1. Verifica se existe
         Categoria categoriaExistente = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o ID: " + id));
 
-        // 2. Atualiza os dados
         categoriaExistente.setCategoria(requestDTO.getCategoria());
         categoriaExistente.setDescricao(requestDTO.getDescricao());
 
-        // 3. Guarda e devolve o DTO
         categoriaExistente = repository.save(categoriaExistente);
         return mapper.toResponseDTO(categoriaExistente);
     }

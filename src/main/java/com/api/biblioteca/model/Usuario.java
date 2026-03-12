@@ -1,5 +1,6 @@
 package com.api.biblioteca.model;
 
+import com.api.biblioteca.model.enums.PerfilUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,18 +26,24 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, length = 100)
     private String nome;
 
-    @Column(nullable = false, length = 100, unique = true) // O username tem de ser único
+    @Column(nullable = false, length = 100, unique = true)
     private String usuario;
 
     @Column(nullable = false, length = 100)
     private String senha;
 
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PerfilUsuario perfil;
+
     // --- MÉTODOS OBRIGATÓRIOS DO SPRING SECURITY (UserDetails) ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Por agora, todos os utilizadores terão a permissão básica "ROLE_USER"
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.perfil.name()));
     }
 
     @Override
@@ -51,21 +58,21 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // A conta nunca expira
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // A conta não está bloqueada
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // A senha não expira
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // O utilizador está ativo
+        return this.ativo;
     }
 }

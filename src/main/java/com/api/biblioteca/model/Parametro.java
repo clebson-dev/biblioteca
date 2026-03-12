@@ -16,7 +16,6 @@ public class Parametro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // columnDefinition é útil para forçar o tipo exato do SQL quando diverge do padrão
     @Column(nullable = false, columnDefinition = "TINYTEXT")
     private String parametro;
 

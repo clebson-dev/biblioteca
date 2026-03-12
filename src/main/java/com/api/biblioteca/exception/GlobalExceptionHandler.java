@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Tratamento para Validações de DTOs (@Valid falhou)
+    // Tratamento para Validações de DTOs (@Valid falhou)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    // 2. Tratamento para Recurso Não Encontrado (404)
+    // Tratamento para Recurso Não Encontrado (404)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex, HttpServletRequest request) {
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    // 3. Tratamento para Regras de Negócio (422)
+    // Tratamento para Regras de Negócio (422)
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<ErrorResponse> handleRegraNegocioException(
             RegraNegocioException ex, HttpServletRequest request) {
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 
-    // 4. NOVA REGRA: Tratamento para Falhas de Autenticação (Login Incorreto - 401)
+    // Tratamento para Falhas de Autenticação (Login Incorreto - 401)
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
             AuthenticationException ex, HttpServletRequest request) {

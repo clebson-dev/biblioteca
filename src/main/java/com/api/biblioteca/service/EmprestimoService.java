@@ -5,6 +5,7 @@ import com.api.biblioteca.dto.EmprestimoResponseDTO;
 import com.api.biblioteca.exception.RegraNegocioException;
 import com.api.biblioteca.exception.ResourceNotFoundException;
 import com.api.biblioteca.model.*;
+import com.api.biblioteca.model.enums.StatusEmprestimo;
 import com.api.biblioteca.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,19 +29,16 @@ public class EmprestimoService {
 
     @Transactional
     public EmprestimoResponseDTO realizarEmprestimo(EmprestimoRequestDTO request) {
-        // 1. Validar utilizador e aluno
         Usuario usuario = usuarioRepository.findById(request.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Utilizador não encontrado."));
         Aluno aluno = alunoRepository.findById(request.getIdAluno())
                 .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado."));
 
-        // 2. Validar se os livros existem
         List<Livro> livros = livroRepository.findAllById(request.getIdLivros());
         if (livros.size() != request.getIdLivros().size()) {
             throw new RegraNegocioException("Um ou mais livros solicitados não existem no acervo.");
         }
 
-        // 3. Criar o cabeçalho do Empréstimo
         Emprestimo emprestimo = new Emprestimo();
         emprestimo.setUsuario(usuario);
         emprestimo.setAluno(aluno);
@@ -48,13 +46,12 @@ public class EmprestimoService {
         emprestimo.setDataDevolucaoPrevista(request.getDataDevolucaoPrevista());
         emprestimo = emprestimoRepository.save(emprestimo);
 
-        // 4. Criar os itens do Empréstimo (A tabela ponte)
         Emprestimo finalEmprestimo = emprestimo;
         List<EmprestimoLivro> itens = livros.stream().map(livro -> {
             EmprestimoLivro item = new EmprestimoLivro();
             item.setEmprestimo(finalEmprestimo);
             item.setLivro(livro);
-            item.setDataDevolucao(null); // Ainda não devolvido
+            item.setDataDevolucao(null);
             return emprestimoLivroRepository.save(item);
         }).collect(Collectors.toList());
 
@@ -63,30 +60,27 @@ public class EmprestimoService {
 
     @Transactional
     public String devolverLivro(Integer idEmprestimo, Integer idLivro) {
-        // 1. Localizar o item específico
+
         EmprestimoLivro item = emprestimoLivroRepository.findByEmprestimoIdAndLivroId(idEmprestimo, idLivro)
                 .orElseThrow(() -> new ResourceNotFoundException("O livro especificado não pertence a este empréstimo."));
 
-        // 2. Verificar se já não foi devolvido antes
         if (item.getDataDevolucao() != null) {
             throw new RegraNegocioException("Este livro já foi registado como devolvido anteriormente.");
         }
 
-        // 3. Efetuar devolução
         item.setDataDevolucao(LocalDate.now());
         emprestimoLivroRepository.save(item);
 
-        // 4. Regra de Negócio: Calcular Multa
         LocalDate prevista = item.getEmprestimo().getDataDevolucaoPrevista();
         if (LocalDate.now().isAfter(prevista)) {
             long diasAtraso = ChronoUnit.DAYS.between(prevista, LocalDate.now());
-            float valorPorDia = 2.50f; // Idealmente isto viria da tabela 'parametro'
+            float valorPorDia = 2.50f;
             float valorTotalMulta = diasAtraso * valorPorDia;
 
             Multa multa = new Multa();
             multa.setEmprestimoLivro(item);
             multa.setValor(valorTotalMulta);
-            multa.setDataPagamento(LocalDate.now()); // Assumindo pagamento no ato para simplificar
+            multa.setDataPagamento(LocalDate.now());
             multaRepository.save(multa);
 
             return "Livro devolvido com " + diasAtraso + " dias de atraso. Multa gerada: €" + String.format("%.2f", valorTotalMulta);
@@ -104,7 +98,6 @@ public class EmprestimoService {
         return mapearParaResponseDTO(emprestimo, itens);
     }
 
-    // Mapeamento manual para termos maior controlo sobre as coleções complexas
     private EmprestimoResponseDTO mapearParaResponseDTO(Emprestimo emprestimo, List<EmprestimoLivro> itensLivro) {
         EmprestimoResponseDTO dto = new EmprestimoResponseDTO();
         dto.setId(emprestimo.getId());
@@ -120,9 +113,13 @@ public class EmprestimoService {
             itemDTO.setDataDevolucao(item.getDataDevolucao());
 
             if (item.getDataDevolucao() != null) {
-                itemDTO.setStatus(item.getDataDevolucao().isAfter(emprestimo.getDataDevolucaoPrevista()) ? "DEVOLVIDO COM ATRASO" : "DEVOLVIDO");
+                itemDTO.setStatus(item.getDataDevolucao().isAfter(emprestimo.getDataDevolucaoPrevista())
+                        ? StatusEmprestimo.DEVOLVIDO_COM_ATRASO
+                        : StatusEmprestimo.DEVOLVIDO);
             } else {
-                itemDTO.setStatus(LocalDate.now().isAfter(emprestimo.getDataDevolucaoPrevista()) ? "EM ATRASO" : "PENDENTE");
+                itemDTO.setStatus(LocalDate.now().isAfter(emprestimo.getDataDevolucaoPrevista())
+                        ? StatusEmprestimo.EM_ATRASO
+                        : StatusEmprestimo.PENDENTE);
             }
             return itemDTO;
         }).collect(Collectors.toList());

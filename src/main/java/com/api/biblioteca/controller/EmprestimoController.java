@@ -30,7 +30,6 @@ public class EmprestimoController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    // Endpoint específico para devolver um livro de um empréstimo
     @PutMapping("/{idEmprestimo}/devolucao/{idLivro}")
     public ResponseEntity<Map<String, String>> devolverLivro(
             @PathVariable Integer idEmprestimo,

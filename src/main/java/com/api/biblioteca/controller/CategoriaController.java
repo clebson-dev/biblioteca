@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categorias")
 @RequiredArgsConstructor
-@CrossOrigin("*") // Permite que a nossa página HTML consuma esta API
+@CrossOrigin("*")
 public class CategoriaController {
 
     private final CategoriaService service;
@@ -29,7 +29,6 @@ public class CategoriaController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    // O @Valid é crucial aqui! É ele que aciona as verificações do DTO (ex: @NotBlank) e gera o erro se falharem.
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> salvar(@Valid @RequestBody CategoriaRequestDTO requestDTO) {
         CategoriaResponseDTO novaCategoria = service.salvar(requestDTO);
@@ -44,6 +43,6 @@ public class CategoriaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Integer id) {
         service.excluir(id);
-        return ResponseEntity.noContent().build(); // Devolve status 204 (No Content) após apagar
+        return ResponseEntity.noContent().build();
     }
 }

@@ -20,7 +20,6 @@ public class LivroRequestDTO {
     @Size(max = 45, message = "O ISBN não pode exceder 45 caracteres.")
     private String isbn;
 
-    // Recebemos apenas os IDs das chaves estrangeiras
     @NotNull(message = "A categoria é obrigatória.")
     private Integer idCategoria;
 

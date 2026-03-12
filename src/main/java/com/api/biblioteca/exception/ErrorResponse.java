@@ -17,7 +17,6 @@ public class ErrorResponse {
     private String message;
     private String path;
 
-    // Lista para erros de validação (ex: múltiplos campos vazios)
     private List<ValidationError> validationErrors;
 
     @Data

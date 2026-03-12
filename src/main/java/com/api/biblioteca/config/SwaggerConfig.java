@@ -15,9 +15,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("API Biblioteca 1000Devs").version("1.0").description("API Profissional com Segurança JWT"))
-                // Adiciona a obrigatoriedade do Token globalmente
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                // Define como o Token deve ser enviado (HTTP Bearer)
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
                                 .name("bearerAuth")

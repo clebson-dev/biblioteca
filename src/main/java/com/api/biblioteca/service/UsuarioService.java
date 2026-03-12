@@ -19,23 +19,45 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final UsuarioMapper mapper;
-    private final PasswordEncoder passwordEncoder; // Injetado automaticamente pelo Lombok
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public List<UsuarioDTOs.Response> listarTodos() {
-        return repository.findAll().stream()
+        return repository.findAllByAtivoTrue().stream()
                 .map(mapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public UsuarioDTOs.Response salvar(UsuarioDTOs.Request dto) {
-        // Encripta a senha ANTES de converter para Entidade e salvar na base de dados
         dto.setSenha(passwordEncoder.encode(dto.getSenha()));
 
         Usuario usuario = mapper.toEntity(dto);
         usuario = repository.save(usuario);
 
         return mapper.toResponseDTO(usuario);
+    }
+
+    @Transactional
+    public UsuarioDTOs.Response atualizar(Integer id, UsuarioDTOs.Request dto) {
+        Usuario usuarioExistente = repository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilizador não encontrado com o ID: " + id));
+
+        usuarioExistente.setNome(dto.getNome());
+        usuarioExistente.setUsuario(dto.getUsuario());
+
+        usuarioExistente.setSenha(passwordEncoder.encode(dto.getSenha()));
+
+        usuarioExistente = repository.save(usuarioExistente);
+        return mapper.toResponseDTO(usuarioExistente);
+    }
+
+    @Transactional
+    public void excluir(Integer id) {
+        Usuario usuario = repository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilizador não encontrado com o ID: " + id));
+
+        usuario.setAtivo(false);
+        repository.save(usuario);
     }
 }

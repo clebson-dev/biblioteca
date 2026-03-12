@@ -20,7 +20,6 @@ public class AuthController {
     private final AuthenticationManager manager;
     private final TokenService tokenService;
 
-    // DTOs internos apenas para o Login
     @Data
     public static class LoginDTO {
         @NotBlank private String usuario;
@@ -36,13 +35,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> efetuarLogin(@RequestBody @Valid LoginDTO dados) {
-        // Empacota as credenciais
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.getUsuario(), dados.getSenha());
 
-        // O Spring vai usar o AutenticacaoService para validar na base de dados
         var authentication = manager.authenticate(authenticationToken);
 
-        // Gera o token JWT para o utilizador autenticado
         var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
 
         return ResponseEntity.ok(new TokenDTO(tokenJWT));

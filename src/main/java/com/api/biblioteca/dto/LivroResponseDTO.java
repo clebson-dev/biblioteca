@@ -11,7 +11,6 @@ public class LivroResponseDTO {
     private Integer anoPublicacao;
     private String isbn;
 
-    // Devolvemos versões limpas dos relacionamentos
     private CategoriaResponseDTO categoria;
     private EditoraResponseDTO editora;
     private List<AutorResponseDTO> autores;

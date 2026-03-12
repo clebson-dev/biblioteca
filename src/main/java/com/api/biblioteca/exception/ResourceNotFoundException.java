@@ -1,6 +1,5 @@
 package com.api.biblioteca.exception;
 
-// Esta anotação diz ao Spring qual o status HTTP a devolver (404)
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

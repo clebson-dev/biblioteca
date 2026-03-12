@@ -28,20 +28,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
-                    // Libertar rotas públicas (Login e Documentação Swagger)
                     req.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll();
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-
-                    // Trancar TODAS as outras rotas (precisam de Token)
+                    req.requestMatchers("/api/usuarios/**").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
-                // Adiciona o nosso Filtro ANTES do filtro padrão do Spring
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    // AQUI ESTÁ A SOLUÇÃO DO TEU ERRO!
-    // Este Bean ensina o Spring a injetar o AuthenticationManager no teu AuthController
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
@@ -49,6 +44,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Padrão de mercado para encriptação de passwords
+        return new BCryptPasswordEncoder();
     }
 }

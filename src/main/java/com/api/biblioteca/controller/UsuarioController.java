@@ -26,4 +26,15 @@ public class UsuarioController {
     public ResponseEntity<UsuarioDTOs.Response> salvar(@Valid @RequestBody UsuarioDTOs.Request dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.salvar(dto));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioDTOs.Response> atualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioDTOs.Request dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Integer id) {
+        service.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }

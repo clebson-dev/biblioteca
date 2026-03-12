@@ -1,6 +1,8 @@
 package com.api.biblioteca.dto;
 
+import com.api.biblioteca.model.enums.PerfilUsuario;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -19,6 +21,9 @@ public class UsuarioDTOs {
         @NotBlank(message = "A senha é obrigatória.")
         @Size(max = 100)
         private String senha;
+
+        @NotNull(message = "O perfil de acesso é obrigatório.")
+        private PerfilUsuario perfil;
     }
 
     @Data
@@ -26,6 +31,8 @@ public class UsuarioDTOs {
         private Integer id;
         private String nome;
         private String usuario;
-        // Senha omitida propositadamente!
+        private PerfilUsuario perfil;
+        private Boolean ativo;
+
     }
 }

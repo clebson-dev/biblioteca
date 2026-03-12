@@ -45,7 +45,6 @@ public class LivroService {
 
     @Transactional
     public LivroResponseDTO salvar(LivroRequestDTO requestDTO) {
-        // 1. Validar se as chaves estrangeiras existem na base de dados
         Categoria categoria = categoriaRepository.findById(requestDTO.getIdCategoria())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada (ID: " + requestDTO.getIdCategoria() + ")"));
 
@@ -57,13 +56,11 @@ public class LivroService {
             throw new ResourceNotFoundException("Um ou mais Autores fornecidos não existem na base de dados.");
         }
 
-        // 2. Converter DTO para Entidade e associar os objetos reais validados
         Livro livro = mapper.toEntity(requestDTO);
         livro.setCategoria(categoria);
         livro.setEditora(editora);
         livro.setAutores(autores);
 
-        // 3. Gravar e devolver DTO de resposta
         livro = livroRepository.save(livro);
         return mapper.toResponseDTO(livro);
     }

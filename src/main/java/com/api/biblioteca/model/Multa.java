@@ -17,7 +17,6 @@ public class Multa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // Relação OneToOne: Um item de empréstimo atrasado gera, no máximo, uma multa.
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_emprestimo_livro", nullable = false, unique = true)
     private EmprestimoLivro emprestimoLivro;
